@@ -1,0 +1,328 @@
+&ACCESS RVP
+&REL 38
+&PARAM TEMPLATE = C:\KRC\Roboter\Template\vorgabe
+&PARAM EDITMASK = *
+DEF ursoaula( )
+SIGNAL ENTRADA $IN[4] TO $IN[5]  
+POS P2
+REAL S
+INT CONT
+FRAME MESA 
+;FOLD INI
+  ;FOLD BASISTECH INI
+    GLOBAL INTERRUPT DECL 3 WHEN $STOPMESS==TRUE DO IR_STOPM ( )
+    INTERRUPT ON 3 
+    BAS (#INITMOV,0 )
+  ;ENDFOLD (BASISTECH INI)
+;FOLD SPOTTECH INI
+USERSPOT(#INIT)
+;ENDFOLD (SPOTTECH INI)
+;FOLD GRIPPERTECH INI
+USER_GRP(0,DUMMY,DUMMY,GDEFAULT)
+;ENDFOLD (GRIPPERTECH INI)
+  ;FOLD USER INI
+    ;Make your modifications here
+
+  ;ENDFOLD (USER INI)
+;ENDFOLD (INI)
+
+;FOLD PTP HOME  Vel= 100 % DEFAULT;%{PE}%MKUKATPBASIS,%CMOVE,%VPTP,%P 1:PTP, 2:HOME, 3:, 5:100, 7:DEFAULT
+$BWDSTART = FALSE
+PDAT_ACT=PDEFAULT
+FDAT_ACT=FHOME
+BAS (#PTP_PARAMS,100 )
+$H_POS=XHOME
+PTP  XHOME
+;ENDFOLD
+
+;FOLD PTP P1 Vel=100 % PDAT1 Tool[1]:1 Base[0];%{PE}%R 5.6.13,%MKUKATPBASIS,%CMOVE,%VPTP,%P 1:PTP, 2:P1, 3:, 5:100, 7:PDAT1
+$BWDSTART=FALSE
+PDAT_ACT=PPDAT1
+FDAT_ACT=FP1
+BAS(#PTP_PARAMS,100)
+PTP XP1 
+;ENDFOLD
+
+LOOP
+    P2=XP1
+    CONT=1
+    MESA={X 0, Y 0,Z 0,A 0,B 0, C 0}
+    MESA.X=XP1.X -100
+    MESA.Y=XP1.Y
+    MESA.Z=XP1.Z
+    MESA.A=-90                             ; PORTRAIT TO LANDSCAPE
+    P2.X=0
+    P2.Y=0
+    P2.Z=0
+    
+    WAIT FOR $IN[1]
+
+    IF $IN[2] THEN
+        EXIT
+    ENDIF
+
+    IF $IN[3] THEN
+        MESA.Y=MESA.Y
+    ELSE
+        MESA.Y=MESA.Y + 120 
+    ENDIF
+    LOOP
+    SWITCH ENTRADA
+
+        CASE 'B01'                  ; RIGHT SWITCH DOWN
+            LIN MESA:P2
+		
+            S=0.85                  ; SCALE = 85%
+	           PLTURSO(P2,S,MESA)
+        CASE 'B10'                  ; LEFT SWITCH DOWN
+
+            LIN MESA:P2
+            S=0.75                  ; SCALE = 75%
+	           PLTURSO(P2,S,MESA)
+        CASE 'B11'                  ; BOTH SWITCHES DOWN
+
+            LIN MESA:P2
+            S=0.65                  ; SCALE = 65%
+	           PLTURSO(P2,S,MESA)
+        DEFAULT                     ; BOTH SWITCHES UP                   
+
+            LIN MESA:P2
+            S=0.5                   ; SCALE = 50%
+	           PLTURSO(P2,S,MESA)
+    ENDSWITCH
+    IF CONT ==2 THEN                ; BOTH SIDES OF PAPER SHEET
+        EXIT
+    ELSE
+        MESA.X=MESA.X +100          ; DRAW THE UPPER QUADRANT
+        CONT=CONT+1    
+     ENDIF
+     ENDLOOP
+ENDLOOP
+
+;FOLD PTP HOME  Vel= 100 % DEFAULT;%{PE}%MKUKATPBASIS,%CMOVE,%VPTP,%P 1:PTP, 2:HOME, 3:, 5:100, 7:DEFAULT
+$BWDSTART = FALSE
+PDAT_ACT=PDEFAULT
+FDAT_ACT=FHOME
+BAS (#PTP_PARAMS,100 )
+$H_POS=XHOME
+PTP  XHOME
+;ENDFOLD
+
+END
+
+;  -----------------------------------------------------
+;             PASTE PLOT FUNCTION BELOW
+;  -----------------------------------------------------   
+
+
+DEF PLTURSO(P,S,MESA:IN)
+POS P, E, M
+FRAME MESA
+REAL S
+
+P.Y = P.Y + 6.5*S
+
+LIN MESA:P
+P.Z = P.Z - 30
+LIN MESA:P
+P.Y = P.Y + 30*S
+LIN MESA:P
+M = P
+M.X = P.X + 14*S
+M.Y = P.Y + 23.5*S
+E = P
+E.X = P.X + 40*S
+E.Y = P.Y + 32*S
+CIRC MESA:M,MESA:E,CA 82.2
+P.X = P.X + 40*S
+P.Y = P.Y + 32*S
+P.X = P.X + 15*S
+LIN MESA:P
+P.X = P.X + 15*S
+P.Y = P.Y + 9.5*S
+LIN MESA:P
+M = P
+M.X = P.X + 3*S
+M.Y = P.Y + 4.5*S
+E = P
+E.X = P.X + 7.5*S
+E.Y = P.Y + 1.5*S
+CIRC MESA:M,MESA:E,CA 180.0
+P.X = P.X + 7.5*S
+P.Y = P.Y + 1.5*S
+M = P
+M.X = P.X + 6.5*S
+M.Y = P.Y + 1*S
+E = P
+E.X = P.X + 8.5*S
+E.Y = P.Y - 3.5*S
+CIRC MESA:M,MESA:E,CA 149.6
+P.X = P.X + 8.5*S
+P.Y = P.Y - 3.5*S
+P.X = P.X - 8.5*S
+P.Y = P.Y + 3.5*S
+LIN MESA:P
+P.Z = P.Z + 30
+LIN MESA:P
+WAIT SEC 1
+P.X = P.X + 8.5*S
+P.Y = P.Y - 3.5*S
+LIN MESA:P
+P.Z = P.Z - 30
+LIN MESA:P
+WAIT SEC 1
+P.X = P.X + 4*S
+P.Y = P.Y - 1.6*S
+LIN MESA:P
+P.X = P.X + 8.5*S
+P.Y = P.Y - 6.5*S
+LIN MESA:P
+M = P
+M.X = P.X - 1.0*S
+M.Y = P.Y - 1.5*S
+E = P
+E.X = P.X - 1.5*S
+E.Y = P.Y - 3.4*S
+CIRC MESA:M,MESA:E,CA 65.0
+P.X = P.X - 1.5*S
+P.Y = P.Y - 3.4*S
+LIN MESA:P
+P.X = P.X - 4.5*S
+LIN MESA:P
+P.Z = P.Z + 30
+LIN MESA:P
+WAIT SEC 1
+P.X = P.X + 6*S
+P.Y = P.Y + 3.4*S
+P.Z = P.Z - 30
+LIN MESA:P
+WAIT SEC 1
+P.X = P.X + 1.5*S
+P.Y = P.Y - 1.1*S
+LIN MESA:P
+M = P
+M.X = P.X - 9.0*S
+M.Y = P.Y - 7.8*S
+E = P
+E.X = P.X - 12.5*S
+E.Y = P.Y + 2.2*S
+CIRC MESA:M,MESA:E,CA 139.4
+P.Z = P.Z + 30
+LIN MESA:P
+WAIT SEC 1
+P.X = P.X - 9.0*S
+P.Y = P.Y - 5.8*S
+LIN MESA:P
+WAIT SEC 1
+P.Z = P.Z - 30
+LIN MESA:P
+WAIT SEC 1
+P.X = P.X + 7*S
+LIN MESA:P
+P.Z = P.Z + 30
+LIN MESA:P
+WAIT SEC 1
+P.X = P.X - 7.0*S
+P.Y = P.Y - 2.0*S
+LIN MESA:P
+P.Z = P.Z - 30
+LIN MESA:P
+WAIT SEC 1
+P.X = P.X - 5.5*S
+P.Y = P.Y - 1.5*S
+LIN MESA:P
+P.X = P.X - 5.5*S
+P.Y = P.Y - 7.0*S
+LIN MESA:P
+M = P
+M.X = P.X - 2.5*S
+M.Y = P.Y - 17.0*S
+E = P
+E.X = P.X - 7.5*S
+E.Y = P.Y - 32.0*S
+CIRC MESA:M,MESA:E,CA 20.1
+P.X = P.X - 7.5*S
+P.Y = P.Y - 32.0*S
+P.Y = P.Y - 18.5*S
+LIN MESA:P
+P.X = P.X - 10.0*S
+LIN MESA:P
+P.Y = P.Y + 12.5*S
+LIN MESA:P
+P.Y = P.Y - 12.5*S
+LIN MESA:P
+P.X = P.X - 7.5*S
+LIN MESA:P
+M = P
+M.X = P.X - 5.5*S
+M.Y = P.Y + 3*S
+E = P
+E.X = P.X - 7.5*S
+E.Y = P.Y + 9*S
+CIRC MESA:M,MESA:E,CA 84.0
+P.X = P.X - 7.5*S
+P.Y = P.Y + 9*S
+P.X = P.X - 7.5*S
+P.Y = P.Y + 23*S
+LIN MESA:P
+M = P
+M.X = P.X + 3.5*S
+M.Y = P.Y + 20.3*S
+E = P
+E.X = P.X + 16*S
+E.Y = P.Y + 36.5*S
+CIRC MESA:M,MESA:E,CA 55.1
+P.Z = P.Z + 30
+P.X = P.X + 16*S
+P.Y = P.Y + 36.5*S
+LIN MESA:P
+WAIT SEC 1
+P.X = P.X - 16*S
+P.Y = P.Y - 36.5*S
+P.X = P.X + 3.75*S
+P.Y = P.Y - 11.5*S
+LIN MESA:P
+P.Z = P.Z - 30
+LIN MESA:P
+WAIT SEC 1
+M = P
+M.X = P.X - 4.75*S
+M.Y = P.Y - 0.5*S
+E = P
+E.X = P.X - 7.25*S
+E.Y = P.Y - 4.0*S
+CIRC MESA:M,MESA:E,CA 96.9
+P.X = P.X - 7.25*S
+P.Y = P.Y - 4.0*S
+P.Y = P.Y - 16.5*S
+LIN MESA:P
+P.X = P.X - 9.0*S
+LIN MESA:P
+M = P
+M.X = P.X - 4.5*S
+M.Y = P.Y + 3*S
+E = P
+E.X = P.X - 6.0*S
+E.Y = P.Y + 8*S
+CIRC MESA:M,MESA:E,CA 85.7
+P.X = P.X - 6.0*S
+P.Y = P.Y + 8*S
+P.Y = P.Y + 7*S
+LIN MESA:P
+P.X = P.X - 5.5*S
+P.Y = P.Y - 3.5*S
+LIN MESA:P
+P.Y = P.Y - 7.5*S
+LIN MESA:P
+M = P
+M.X = P.X - 7.5*S
+M.Y = P.Y - 4.0*S
+E = P
+E.X = P.X - 16.0*S
+E.Y = P.Y + 2.5*S
+CIRC MESA:M,MESA:E,CA 138.0
+P.X = P.X - 16.0*S
+P.Y = P.Y + 2.5*S
+P.Z = P.Z + 30
+LIN MESA:P
+END
