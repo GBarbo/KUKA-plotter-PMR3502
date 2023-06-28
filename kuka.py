@@ -214,7 +214,7 @@ def csvToKUKA(list,title):
     print(f'LIN MESA:P')
     print('END')
 
-path = "/Users/giovanni/Desktop/urso.csv"
+path = "/Users/giovanni/Desktop/KUKA-plotter-PMR3502/urso.csv"
 urso = global_to_relative(path)
 csvToKUKA(urso[0],urso[1])
 
