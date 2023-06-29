@@ -57,7 +57,7 @@ LOOP
     P2.Y=0
     P2.Z=0
 
-    IF $IN[2] THEN
+    IF $IN[2] THEN	; Termina o programa antes de desenhar
         EXIT
     ENDIF
 
@@ -67,7 +67,7 @@ LOOP
         
     ELSE
              
-        MESA.Y=MESA.Y + 120
+        MESA.Y=MESA.Y + 120	; Desloca ao longo da maior dimensao da folha
         
     ENDIF
     LOOP
@@ -79,7 +79,7 @@ LOOP
     ENDIF
     
     ;-----------------------------------------------------
-    IF $IN[3] THEN ; Bloco adicionado para não sobrescrever
+    IF $IN[3] THEN	 ; Bloco adicionado para não sobrescrever depois que desenha duas vezes no mesmo lado da folha
 	IF CONT_D > 1 THEN
 	    EXIT
 	ELSE
@@ -96,29 +96,29 @@ LOOP
     
     SWITCH ENTRADA
 
-	CASE 'B01'
+	CASE 'B01'	; Switch 5 para baixo
 	    LIN MESA:P2
 		
-	    S=0.85
+	    S=0.85	; Escala 85%
 		   PLTURSO(P2,S,MESA)
-	CASE 'B10'
+	CASE 'B10'	; Switch 4 para baixo
 
 	    LIN MESA:P2
-	    S=0.75
+	    S=0.75	; Escala 75%
 		   PLTURSO(P2,S,MESA)
-	CASE 'B11'
+	CASE 'B11'	; Ambas switchs para cima
 
 	    LIN MESA:P2
-	    S=0.65
+	    S=0.65	; Escala 65%
 		   PLTURSO(P2,S,MESA)
-	DEFAULT
+	DEFAULT		; Nenhuma switch para cima
 
 	    LIN MESA:P2
-	    S=0.5
+	    S=0.5	; Escala 50%
 		   PLTURSO(P2,S,MESA)
 
     ENDSWITCH
-    IF CONT == 2 THEN
+    IF CONT == 2 THEN	; Condicao para subir o desenho na folha depois de concluir em baixo
 	EXIT
     ELSE
 	MESA.X=MESA.X +100
@@ -139,7 +139,7 @@ PTP  XHOME
 
 END
 
-DEF PLTURSO(P,S,MESA:IN)
+DEF PLTURSO(P,S,MESA:IN)	; Funcao desenho do urso gerada por codigo python
 POS P, E, M
 FRAME MESA
 REAL S
