@@ -13,3 +13,7 @@ Instructions for a KUKA robotic manipulator pen plotter as part of the disciplin
 2. Open the file kuka.py and substitute the "path" variable to the path where the csv file is located. The script should print the KUKA function once run.
 3. Paste the printed function on the src file and call it when necessary specifying (i) the starting point P, (ii) the scale S and (iii) the frame MESA, as following:
 ```PLTURSO(P,S,MESA)```
+
+## Working example
+
+![](example.gif | width=400)
