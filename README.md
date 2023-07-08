@@ -16,4 +16,4 @@ Instructions for a KUKA robotic manipulator pen plotter as part of the disciplin
 
 ## Working example
 
-![](https://github.com/GBarbo/KUKA-plotter-PMR3502/blob/main/example.gif | width=400)
+![](https://github.com/GBarbo/KUKA-plotter-PMR3502/blob/main/example.gif)
